@@ -3,8 +3,8 @@ import os
 from youtube_transcript_api import YouTubeTranscriptApi
 
 
-def get_video_id(url):
-    """Get the video ID from a YouTube URL"""
+def vid_id(url):
+   
     if "youtu.be/" in url:
         return url.split("youtu.be/")[1].split("?")[0]
     elif "watch?v=" in url:
@@ -14,30 +14,30 @@ def get_video_id(url):
         return None
 
 
-def clean_text(text):
-    """Clean transcript text - remove line breaks and extra spaces"""
+def sweep_txt(text):
+   
     text = text.replace("\n", " ")
     text = " ".join(text.split())
     return text
 
 
-def download_transcript(url):
-    """Download and save YouTube video transcript"""
+def fetch_transcript(url):
+ 
     # Get video ID
-    video_id = get_video_id(url)
+    video_id = vid_id(url)
     if not video_id:
         return
 
-    # Create outputs folder if it doesn't exist
+
     os.makedirs("outputs", exist_ok=True)
 
-    # Get transcript using fetch method
-    print("Downloading transcript...")
+   
+    
     try:
         ytt_api = YouTubeTranscriptApi()
         transcript = ytt_api.fetch(video_id)
     except Exception as e:
-        print(f"Error downloading transcript: {e}")
+        print(f"fuck: {e}")
         return
 
     # Process transcript segments
@@ -45,7 +45,7 @@ def download_transcript(url):
     structured_data = []
 
     for segment in transcript:
-        cleaned = clean_text(segment.text)
+        cleaned = sweep_txt(segment.text)
         if cleaned:
             full_text.append(cleaned)
             structured_data.append({
@@ -54,12 +54,11 @@ def download_transcript(url):
                 "duration": segment.duration
             })
 
-    # Save as TXT file
+
     txt_path = f"outputs/{video_id}.txt"
     with open(txt_path, "w", encoding="utf-8") as file:
         file.write(" ".join(full_text))
 
-    # Save as JSON file
     json_path = f"outputs/{video_id}.json"
     with open(json_path, "w", encoding="utf-8") as file:
         json.dump(structured_data, file, indent=2, ensure_ascii=False)
@@ -70,10 +69,9 @@ def download_transcript(url):
     print(f"  - Video ID: {video_id}")
 
 
-# Main program
-print("=" * 50)
+
+
 print("YouTube Transcript Downloader - Milestone 1")
-print("=" * 50)
+
 video_url = input("\nEnter YouTube URL: ")
-download_transcript(video_url)
-print("\n" + "=" * 50)
+fetch_transcript(video_url)
